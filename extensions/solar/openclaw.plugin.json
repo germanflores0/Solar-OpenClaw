@@ -1,0 +1,13 @@
+{
+    "id": "solar",
+    "name": "Solar",
+    "description": "Dynamic skills and knowledge injection for OpenClaw agents from the Solar platform",
+    "configSchema": {
+        "type": "object",
+        "properties": {
+            "enabled": {
+                "type": "boolean"
+            }
+        }
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "name": "solar",
+    "version": "1.0.0",
+    "description": "Solar orchestration plugin for OpenClaw — connects agents to the Solar control plane",
+    "type": "module",
+    "main": "index.js",
+    "author": "Solar",
+    "license": "MIT",
+    "dependencies": {
+        "node-fetch": "^3.3.2"
+    },
+    "openclaw": {
+        "extensions": [
+            "./index.js"
+        ]
+    }
+}
