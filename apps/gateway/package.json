@@ -1,0 +1,16 @@
+{
+  "name": "@solar/openclaw-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "openclaw": "latest"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}
