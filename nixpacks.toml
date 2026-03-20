@@ -1,0 +1,16 @@
+# Override: bypass OpenClaw monorepo entirely.
+# Only install and run the Solar gateway (apps/gateway/).
+# The gateway depends only on "openclaw: latest" from npm.
+
+[phases.setup]
+nixpkgsArchive = "51ad838b03a05b1de6f9f2a0fffecee64a9788ee"
+nixPkgs = ["nodejs_22", "npm-9_x"]
+
+[phases.install]
+cmds = ["cd apps/gateway && npm install"]
+
+[phases.build]
+cmds = ["echo 'no build needed'"]
+
+[start]
+cmd = "cd apps/gateway && node server.js"
