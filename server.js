@@ -107,12 +107,19 @@ function installPlugin() {
   // 1. Find where openclaw is installed
   let openclawDir;
   try {
-    const require = createRequire(import.meta.url);
-    const openclawPkg = require.resolve('openclaw/package.json');
+    // Try createRequire first (works in CJS-compatible setups)
+    const req = createRequire(import.meta.url);
+    const openclawPkg = req.resolve('openclaw/package.json');
     openclawDir = path.dirname(openclawPkg);
   } catch {
-    console.warn('[solar] Could not resolve openclaw package path — plugin injection skipped');
-    return;
+    // Fallback: check well-known path relative to project root
+    const fallback = path.join(__dirname, 'node_modules', 'openclaw');
+    if (fs.existsSync(path.join(fallback, 'package.json'))) {
+      openclawDir = fallback;
+    } else {
+      console.warn('[solar] Could not resolve openclaw package path — plugin injection skipped');
+      return;
+    }
   }
 
   // 2. Copy plugin to openclaw's extensions dir

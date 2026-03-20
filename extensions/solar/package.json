@@ -1,5 +1,5 @@
 {
-    "name": "agent-syndicate",
+    "name": "solar",
     "version": "1.0.0",
     "description": "Dynamic skills injection for OpenClaw agents from the Solar platform",
     "type": "module",
