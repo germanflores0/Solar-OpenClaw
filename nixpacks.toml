@@ -1,0 +1,5 @@
+# OpenClaw 2026.3.13 requires Node >=22.16.0
+# nixpkgs commit d7211731 has nodejs_22 = 22.16.0
+[phases.setup]
+nixpkgsArchive = "d7211731d89af9d8930fab948a1a372e15119a02"
+nixPkgs = ["nodejs_22", "npm-9_x"]
