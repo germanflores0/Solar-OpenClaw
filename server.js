@@ -32,6 +32,7 @@
  */
 
 import { spawn } from 'node:child_process';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import http from 'node:http';
 import net from 'node:net';
@@ -162,6 +163,8 @@ function installPlugin() {
   }
 
   // 5. Write openclaw.json with plugin enabled + Control UI disabled
+  // Note: do NOT add custom keys (like meta) — OpenClaw uses strict Zod validation
+  // and rejects unrecognized keys at startup.
   const openclawConfig = {
     gateway: {
       mode: 'local',
@@ -234,13 +237,18 @@ function startOpenClaw() {
   const args = [
     'openclaw', 'gateway',
     '--port', String(OPENCLAW_PORT),
+    // --bind lan required for Railway/Docker; the "non-loopback" warning is expected
     '--bind', 'lan',
     '--allow-unconfigured',
   ];
 
-  if (process.env.OPENCLAW_GATEWAY_TOKEN) {
-    args.push('--token', process.env.OPENCLAW_GATEWAY_TOKEN);
+  // Always pass a token so the gateway is never unprotected.
+  // If OPENCLAW_GATEWAY_TOKEN is not set, generate an ephemeral one.
+  const gatewayToken = process.env.OPENCLAW_GATEWAY_TOKEN || crypto.randomUUID();
+  if (!process.env.OPENCLAW_GATEWAY_TOKEN) {
+    console.warn(`[solar] No OPENCLAW_GATEWAY_TOKEN set — generated ephemeral token: ${gatewayToken}`);
   }
+  args.push('--token', gatewayToken);
 
   openclawProcess = spawn('npx', args, {
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -325,7 +333,7 @@ function proxyRequest(req, res) {
   proxyReq.on('error', (err) => {
     if (!res.headersSent) {
       res.writeHead(502, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Bad Gateway', message: err.message }));
+      res.end(JSON.stringify({ error: 'Bad Gateway', message: 'OpenClaw not available' }));
     }
   });
 
@@ -338,6 +346,11 @@ function proxyRequest(req, res) {
 // =============================================================================
 
 const server = http.createServer((req, res) => {
+  // Security headers for all responses served directly by this proxy
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Cache-Control', 'no-store');
+
   // Health check
   if (req.url === '/health') {
     const status = openclawHealthy && hasApiKey ? 200 : 503;
@@ -347,7 +360,6 @@ const server = http.createServer((req, res) => {
       status: openclawHealthy ? 'ok' : 'starting',
       openclaw: openclawHealthy ? 'running' : 'unavailable',
       hasApiKey,
-      hasSolarConfig: !!(process.env.SOLAR_API_URL && process.env.SOLAR_TOKEN),
     }));
     return;
   }
@@ -359,8 +371,6 @@ const server = http.createServer((req, res) => {
       gateway: 'Solar OpenClaw Gateway',
       status: openclawHealthy ? 'ready' : 'starting',
       solar: {
-        apiUrl: process.env.SOLAR_API_URL || null,
-        agentId: process.env.SOLAR_AGENT_ID || null,
         connected: !!(process.env.SOLAR_TOKEN),
       },
     }));
