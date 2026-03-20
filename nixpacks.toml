@@ -1,4 +1,0 @@
-# OpenClaw 2026.3.13 requires Node >=22.16.0
-# Use latest nixpkgs to get Node 22.16+
-[phases.setup]
-nixPkgs = ["nodejs_22", "npm-9_x"]
