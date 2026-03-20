@@ -1,11 +1,24 @@
 {
-    "name": "solar",
+    "name": "agent-syndicate",
     "version": "1.0.0",
-    "description": "Solar orchestration plugin for OpenClaw — connects agents to the Solar control plane",
+    "description": "Dynamic skills injection for OpenClaw agents from the Solar platform",
     "type": "module",
     "main": "index.js",
+    "scripts": {
+        "build": "tsc",
+        "test": "vitest run"
+    },
+    "keywords": [
+        "openclaw",
+        "plugin",
+        "agent",
+        "solar"
+    ],
     "author": "Solar",
     "license": "MIT",
+    "devDependencies": {
+        "vitest": "^3.0.0"
+    },
     "dependencies": {
         "node-fetch": "^3.3.2"
     },
